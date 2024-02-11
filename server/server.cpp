@@ -61,7 +61,6 @@ public:
                                 const char* response = "1";
                                 WriteFile(hPipe, response, strlen(response) + 1, nullptr, nullptr);
                                 std::cout << "Client with login: " << login << " was disconnected." << std::endl;
-                                CloseHandle(hPipe);
 
                                 if (login == "login1") {
                                     shouldContinue = true;
@@ -69,6 +68,7 @@ public:
                                 }
                                 else {
                                     shouldContinue = false;
+                                    break;
                                 }
                             }
                             else {
@@ -144,7 +144,7 @@ int main() {
                 NamedPipeServer pipeServer(pipeName, users[i].login, users[i].password);
                 pipeServer.PipeCreate();
                 return i;
-            });
+                });
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
@@ -153,6 +153,7 @@ int main() {
         for (int i = 1; i < users.size(); ++i) {
             futures[i].get();
         }
+
 
         int result = MessageBox(NULL, L"Continue working?", L"Shall I continue?", MB_YESNO | MB_ICONQUESTION);
 

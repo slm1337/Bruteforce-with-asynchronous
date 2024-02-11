@@ -169,26 +169,29 @@ int main() {
 
 			std::cout << "Alphabet 0 - small Latin letters and apostrophe\n";
 			std::cout << "Alphabet 1 - small and capital Latin letters and apostrophe + numbers\n";
-			std::cout << "Alphabet 2 - small and capital Latin letters and apostrophe + numbers + small and capital Cyrillic letters\n";
+			std::cout << "Alphabet 2 - small and capital Latin letters and apostrophe + numbers + small and capital Cyrillic letters\n\n";
 			std::cout << "Select the alphabet number (0, 1, or 2):";
 			std::cin >> numberOfAlphabet;
 
-
-			int loginHack[4];
+			int loginsForHacking[4];
 
 			for (int i = 0; i < 4; i++) {
-			
+				std::cout << "Hacking into login" << (i + 2) << "? (1 - hack; 0 - don't hack)" << std::endl;
+				std::cin >> loginsForHacking[i];
 			}
 
 			std::vector<std::future<int>> futures;
-			// создание асинхронно четырех именнованых канала
+			// создание асинхронно именнованых канала для одновременного взлома нескольких логинов
 			for (int i = 0; i < 4; ++i) {
+				if (loginsForHacking[i] == 0)
+					continue;
+
 				std::future<int> fut = std::async(std::launch::async, [i, &passwordCracker, logins, numberOfAlphabet, passLength] {
 					std::wstring pipeName = L"\\\\.\\pipe\\MyNamedPipe" + std::to_wstring(i + 2);
 					passwordCracker.PipeCreate(const_cast<LPWSTR>(pipeName.c_str()), logins[i], numberOfAlphabet, passLength);
 					return i;
 					});
-				std::this_thread::sleep_for(std::chrono::milliseconds(1)); // микрослип для того, что бы текст не накладывался друг на друга
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				futures.push_back(std::move(fut));
 			}
 
